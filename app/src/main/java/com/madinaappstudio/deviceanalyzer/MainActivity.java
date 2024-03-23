@@ -14,6 +14,9 @@ import android.widget.TextView;
 import com.madinaappstudio.deviceanalyzer.databinding.ActivityMainBinding;
 import com.madinaappstudio.deviceanalyzer.networks.NetworkActivity;
 import com.madinaappstudio.deviceanalyzer.sensors.SensorActivity;
+import com.posthog.android.PostHogAndroid;
+import com.posthog.android.PostHogAndroidConfig;
+import com.posthog.android.replay.PostHogSessionReplayConfig;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -21,12 +24,29 @@ import java.time.format.DateTimeFormatter;
 public class MainActivity extends AppCompatActivity {
     private Handler handler;
     Runnable timeRunnable;
-    
+
     ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PostHogSessionReplayConfig sessionReplayConfig = new PostHogSessionReplayConfig(
+                false, false, true, null
+        );
+
+        PostHogAndroidConfig config = new PostHogAndroidConfig(
+                "phc_pQ70jJhZKHRvDIL5ruOErnPy6xiAiWCqlL4ayELj4X8",
+                "https://app.posthog.com",
+                true,
+                true,
+                true,
+                sessionReplayConfig
+        );
+        config.setDebug(true);
+        config.setSessionReplay(false);
+        PostHogAndroid.Companion.setup(this, config);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
@@ -88,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         handler.removeCallbacks(timeRunnable);
     }
 
-    private void setTimeOnMainScreen(){
+    private void setTimeOnMainScreen() {
         handler = new Handler();
         boolean is24HourFormat = DateFormat.is24HourFormat(this);
         if (is24HourFormat) {
